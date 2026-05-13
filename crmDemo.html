@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="sk">
+
+<head>
+  <!-- Google Tag Manager -->
+  <script>
+    (function (w, d, s, l, i) {
+      w[l] = w[l] || [];
+      w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+      var f = d.getElementsByTagName(s)[0],
+        j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : '';
+      j.async = true;
+      j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+      f.parentNode.insertBefore(j, f);
+    })(window, document, 'script', 'dataLayer', 'GTM-54W3SZQC');
+  </script>
+  <!-- End Google Tag Manager -->
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Lead Form</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f7fb;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .card {
+      background: white;
+      padding: 40px;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-size: 28px;
+    }
+
+    p {
+      color: #666;
+      margin-bottom: 30px;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      margin-bottom: 16px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 15px;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #2d7ff9;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      background: #2d7ff9;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .success {
+      margin-top: 20px;
+      color: green;
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Google Tag Manager (noscript) -->
+  <noscript>
+    <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-54W3SZQC"
+      height="0" width="0" style="display:none;visibility:hidden"></iframe>
+  </noscript>
+  <!-- End Google Tag Manager (noscript) -->
+
+  <div class="card">
+
+    <h1>Kontaktujte nás</h1>
+
+    <p>Vyplňte formulár a ozveme sa vám.</p>
+
+    <form id="leadForm">
+
+      <input type="text" name="name" placeholder="Meno" required>
+
+      <input type="email" name="email" placeholder="Email" required>
+
+      <input type="text" name="phone" placeholder="Telefón">
+
+      <button type="submit" id="submitBtn">
+        Odoslať
+      </button>
+
+    </form>
+
+    <div class="success" id="successMessage">
+      Ďakujeme, formulár bol odoslaný.
+    </div>
+
+  </div>
+
+  <script>
+    // UTM capture (pre budúci marketing)
+    function getUTMParams() {
+      const params = new URLSearchParams(window.location.search);
+      return {
+        utm_source: params.get('utm_source'),
+        utm_medium: params.get('utm_medium'),
+        utm_campaign: params.get('utm_campaign')
+      };
+    }
+
+    // Fake API (pripravené na backend / Creatio CRM)
+    async function sendLead(data) {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          console.log("Sending lead to backend / CRM:", data);
+          resolve({ success: true });
+        }, 800);
+      });
+    }
+
+    document.getElementById('leadForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const submitBtn = document.getElementById('submitBtn');
+      const successMessage = document.getElementById('successMessage');
+
+      const formData = {
+        name: this.name.value,
+        email: this.email.value,
+        phone: this.phone.value,
+        utm: getUTMParams()
+      };
+
+      // GTM tracking event
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: 'lead_submit',
+        form: 'contact_form'
+      });
+
+      // loading state
+      submitBtn.disabled = true;
+      submitBtn.innerText = 'Odosielam...';
+
+      try {
+        const result = await sendLead(formData);
+
+        if (result.success) {
+          successMessage.style.display = 'block';
+          this.reset();
+        } else {
+          alert('Nepodarilo sa odoslať formulár.');
+        }
+
+      } catch (err) {
+        console.error(err);
+        alert('Chyba servera.');
+      }
+
+      submitBtn.disabled = false;
+      submitBtn.innerText = 'Odoslať';
+    });
+  </script>
+
+</body>
+
+</html>
