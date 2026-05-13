@@ -22,9 +22,7 @@
   <title>Lead Form</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -45,16 +43,9 @@
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     }
 
-    h1 {
-      margin-top: 0;
-      margin-bottom: 10px;
-      font-size: 28px;
-    }
+    h1 { margin-top: 0; margin-bottom: 10px; font-size: 28px; }
 
-    p {
-      color: #666;
-      margin-bottom: 30px;
-    }
+    p { color: #666; margin-bottom: 30px; }
 
     input {
       width: 100%;
@@ -65,10 +56,7 @@
       font-size: 15px;
     }
 
-    input:focus {
-      outline: none;
-      border-color: #2d7ff9;
-    }
+    input:focus { outline: none; border-color: #2d7ff9; }
 
     button {
       width: 100%;
@@ -80,17 +68,9 @@
       font-size: 16px;
       font-weight: bold;
       cursor: pointer;
-      transition: 0.2s;
     }
 
-    button:hover {
-      opacity: 0.9;
-    }
-
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
 
     .success {
       margin-top: 20px;
@@ -107,25 +87,21 @@
     <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-54W3SZQC"
       height="0" width="0" style="display:none;visibility:hidden"></iframe>
   </noscript>
-  <!-- End Google Tag Manager (noscript) -->
+  <!-- End GTM -->
 
   <div class="card">
 
     <h1>Kontaktujte nás</h1>
-
     <p>Vyplňte formulár a ozveme sa vám.</p>
 
     <form id="leadForm">
 
       <input type="text" name="name" placeholder="Meno" required>
-
       <input type="email" name="email" placeholder="Email" required>
-
       <input type="text" name="phone" placeholder="Telefón">
+      <input type="text" name="website" placeholder="Web stránka (voliteľné)">
 
-      <button type="submit" id="submitBtn">
-        Odoslať
-      </button>
+      <button type="submit" id="submitBtn">Odoslať</button>
 
     </form>
 
@@ -136,7 +112,6 @@
   </div>
 
   <script>
-    // UTM capture (pre budúci marketing)
     function getUTMParams() {
       const params = new URLSearchParams(window.location.search);
       return {
@@ -145,8 +120,6 @@
         utm_campaign: params.get('utm_campaign')
       };
     }
-
- 
 
     document.getElementById('leadForm').addEventListener('submit', async function (e) {
       e.preventDefault();
@@ -158,35 +131,49 @@
         name: this.name.value,
         email: this.email.value,
         phone: this.phone.value,
-        utm: getUTMParams()
+        website: this.website.value,
+        utm: getUTMParams(),
+
+        // 🔥 pripravené pre Creatio mapping
+        leadType: "inbound"
       };
 
-      // GTM tracking event
+      // GTM event (submit click)
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push({
         event: 'lead_submit',
         form: 'contact_form'
       });
 
-      // loading state
       submitBtn.disabled = true;
       submitBtn.innerText = 'Odosielam...';
 
       try {
         const result = await fetch('/api/lead', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify(formData)
-});
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        });
+
+        const data = await result.json();
 
         if (result.ok) {
-  successMessage.style.display = 'block';
-  this.reset();
-} else {
-  alert('Nepodarilo sa odoslať formulár');
-}
+
+          // 🔥 GA4 / GTM conversion event
+          window.dataLayer.push({
+            event: 'generate_lead',
+            lead_name: formData.name,
+            lead_email: formData.email
+          });
+
+          successMessage.style.display = 'block';
+          this.reset();
+
+        } else {
+          alert('Nepodarilo sa odoslať formulár');
+        }
 
       } catch (err) {
         console.error(err);
@@ -199,5 +186,4 @@
   </script>
 
 </body>
-
 </html>
