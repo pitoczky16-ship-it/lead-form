@@ -181,14 +181,20 @@
       submitBtn.innerText = 'Odosielam...';
 
       try {
-        const result = await sendLead(formData);
+        const result = await fetch('/api/lead', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(formData)
+});
 
-        if (result.success) {
-          successMessage.style.display = 'block';
-          this.reset();
-        } else {
-          alert('Nepodarilo sa odoslať formulár.');
-        }
+        if (result.ok) {
+  successMessage.style.display = 'block';
+  this.reset();
+} else {
+  alert('Nepodarilo sa odoslať formulár');
+}
 
       } catch (err) {
         console.error(err);
