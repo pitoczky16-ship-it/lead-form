@@ -146,15 +146,7 @@
       };
     }
 
-    // Fake API (pripravené na backend / Creatio CRM)
-    async function sendLead(data) {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          console.log("Sending lead to backend / CRM:", data);
-          resolve({ success: true });
-        }, 800);
-      });
-    }
+ 
 
     document.getElementById('leadForm').addEventListener('submit', async function (e) {
       e.preventDefault();
