@@ -19,9 +19,9 @@ export default async function handler(req, res) {
           Email: data.email,
           MobilePhone: data.phone,
 
-          UtmSourceStr: data.utm?.utm_source,
-          UtmMediumStr: data.utm?.utm_medium,
-          UtmCampaignStr: data.utm?.utm_campaign
+          UtmSourceStr: data.utm?.utm_source || "",
+UtmMediumStr: data.utm?.utm_medium || "",
+UtmCampaignStr: data.utm?.utm_campaign || ""
         })
       }
     );
